@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import getpass
 import os
 import sys
 
@@ -397,6 +398,17 @@ def app_dir() -> str:
     return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
+def user_name() -> str:
+    """Nama user OS yang sedang login (dinamis, bukan hardcoded)."""
+    try:
+        name = getpass.getuser().strip()
+        if name:
+            return name
+    except Exception:
+        pass
+    return os.path.basename(os.path.expanduser("~")) or "User"
+
+
 def settings_path() -> str:
     """Simpan pengaturan per-user di AppData agar aman saat di-publish.
 
@@ -405,7 +417,7 @@ def settings_path() -> str:
     """
     appdata = os.environ.get("APPDATA")
     if appdata:
-        folder = os.path.join(appdata, "YOKOTO", APP_NAME)
+        folder = os.path.join(appdata, user_name(), APP_NAME)
         try:
             os.makedirs(folder, exist_ok=True)
             return os.path.join(folder, "novacode_settings.json")

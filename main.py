@@ -26,7 +26,7 @@ from nova.ai_chat import AIAssistant
 from nova.config import (APP_NAME, APP_TITLE, APP_VERSION, COLORS,
                          apply_theme, asset_path, available_themes,
                          is_light_theme, language_for, language_label,
-                         settings_path)
+                         settings_path, user_name)
 from nova.diagnostics import analyze_output
 from nova.explorer import FileExplorer
 from nova.findreplace import FindReplaceBar
@@ -757,7 +757,7 @@ class NovaApp(ctk.CTk):
         )
         ctk.CTkLabel(win, text=desc, justify="center", font=("Segoe UI", 12),
                      text_color=COLORS["text"]).pack()
-        ctk.CTkLabel(win, text="Diterbitkan sebagai YOKOTO — portable untuk semua pengguna.",
+        ctk.CTkLabel(win, text=f"Diterbitkan sebagai {user_name()} — portable untuk semua pengguna.",
                      font=("Segoe UI", 10), text_color=COLORS["muted"]).pack(pady=(18, 12))
         ctk.CTkButton(win, text="Tutup", width=110, command=win.destroy).pack(pady=(0, 20))
 

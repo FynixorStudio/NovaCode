@@ -14,7 +14,7 @@ import tkinter as tk
 from PIL import Image, ImageTk
 
 from .animation import mix
-from .config import APP_NAME, APP_VERSION, COLORS, asset_path
+from .config import APP_NAME, APP_VERSION, COLORS, asset_path, user_name
 
 _W, _H = 520, 310
 _CX = _W // 2
@@ -95,7 +95,7 @@ class SplashScreen(tk.Toplevel):
         self._status = c.create_text(_CX, 253, text=_STEPS[0][1],
                                      fill=COLORS["muted"], font=("Segoe UI", 11))
         c.create_text(_CX, 286,
-                      text=f"YOKOTO  ·  v{APP_VERSION}     •     klik untuk lewati",
+                      text=f"{user_name()}  ·  v{APP_VERSION}     •     klik untuk lewati",
                       fill=COLORS["muted"], font=("Segoe UI", 9))
 
     # ------------------------------------------------------------------

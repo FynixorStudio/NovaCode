@@ -172,7 +172,7 @@ sequenceDiagram
 </details>
 
 > [!WARNING]
-> API key tersimpan lokal di `%APPDATA%\YOKOTO\NovaCode\novacode_settings.json`. **Jangan bagikan file ini** kalau berisi key pribadi. Env var seperti `OPENROUTER_API_KEY` juga didukung.
+> API key tersimpan lokal di `%APPDATA%\<username>\NovaCode\novacode_settings.json` (`<username>` = nama akun Windows yang sedang login, jadi beda-beda tiap komputer — misal `YOKOTO`, `KENZO`, atau `User`). **Jangan bagikan file ini** kalau berisi key pribadi. Env var seperti `OPENROUTER_API_KEY` juga didukung.
 
 ---
 
