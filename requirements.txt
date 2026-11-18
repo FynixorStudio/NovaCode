@@ -1,0 +1,9 @@
+# Dependensi runtime
+customtkinter>=5.2.0
+
+# Opsional: hanya jika memakai model GGUF langsung di dalam aplikasi
+# (untuk Ollama / LM Studio / API cloud tidak perlu install ini)
+# llama-cpp-python>=0.3.0
+
+# Hanya diperlukan untuk membuat file .exe (lihat build_exe.py)
+pyinstaller>=6.0.0
