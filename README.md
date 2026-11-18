@@ -48,7 +48,7 @@
 ## 🚀 Quickstart
 
 > [!TIP]
-> **Paling cepat:** cari ikon **NovaCode** di Desktop, klik **sekali**, langsung jalan 🗿
+> **Paling cepat:** cari ikon **NovaCode** di Desktop, klik **sekali**, langsung jalan.
 
 | Langkah | Aksi | Visual |
 |:---:|---|---|
@@ -119,7 +119,7 @@ flowchart LR
 
 ## 🎨 Palet tema
 
-Klik ikon roda gigi di toolbar atau menu **Theme** untuk mengganti. Ganti tema = jendela dibuat ulang otomatis supaya **semua** warna ikut berubah 🗿
+Klik ikon roda gigi di toolbar atau menu **Theme** untuk mengganti. Ganti tema = jendela dibuat ulang otomatis supaya **semua** warna ikut berubah.
 
 <p align="center">
   <img src="https://img.shields.io/badge/Ember-%23F59E0B?style=for-the-badge" alt="Ember">
@@ -336,7 +336,7 @@ Hasil: **`dist/NovaCode.exe`** — portable, tanpa perlu Python di komputer tuju
 - [x] Shortcut desktop `NovaCode.lnk` siap pakai.
 - [x] Splash diperlama jadi **4,2 detik**.
 - [x] Tema **Purple Moon** + alias `Ungu Moon`.
-- [x] README ini dibuat lebih visual: badge, diagram, kartu, dan collapsible 🗿
+- [x] README ini dibuat lebih visual: badge, diagram, kartu, dan collapsible.
 
 ---
 
@@ -370,12 +370,13 @@ Proyek ini dibebaskan untuk **penggunaan pribadi dan pembelajaran**. Silakan dim
   <img src="assets/mark_light.png" alt="NovaCode mark" width="36">
   <br>
   Dibuat dengan ❤️ memakai
+  <br>
   <img src="https://img.shields.io/badge/Python-3.9%2B-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python">
   <img src="https://img.shields.io/badge/CustomTkinter-UI-2F81F7?style=flat-square" alt="CustomTkinter">
   <img src="https://img.shields.io/badge/PyInstaller-onefile-9FE6E0?style=flat-square" alt="PyInstaller">
 </p>
 
 > [!TIP]
-> Masih ada ide lain? Simpan di sini, nanti kita bahas lagi bareng 🗿🚀
+> Masih ada ide lain? Simpan di sini, nanti kita bahas lagi bareng 🥳
 
 <!-- novacode-fingerprint: novacode-fp-2026-6f4b8d2c9a1e47f0b3d5 -->
