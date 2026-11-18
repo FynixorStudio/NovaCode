@@ -1,13 +1,5 @@
-#!/usr/bin/env python3
-"""Generator logo NovaCode -> assets/ (icon.ico, logo.png, logo.svg, dll).
 
-Jalankan ulang jika ingin mengubah warna / bentuk:
-    python tools/make_logo.py
 
-Konsep: huruf "N" geometris. Batang kiri + diagonal berwarna terang,
-batang kanan berwarna amber dengan ujung dipotong miring (titik "nova").
-Semua bentuk didefinisikan di grid 1024 supaya PNG dan SVG identik.
-"""
 from __future__ import annotations
 
 import math
@@ -18,17 +10,17 @@ from PIL import Image, ImageDraw, ImageFont
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(os.path.dirname(HERE), "assets")
 
-INK = "#181715"      # latar ikon
-PAPER = "#efebe3"    # warna huruf
-AMBER = "#e5a24b"    # aksen
+INK = "#181715"      
+PAPER = "#efebe3"    
+AMBER = "#e5a24b"    
 GRID = 1024
-SS = 4               # supersampling untuk tepi halus
+SS = 4               
 
-# Geometri N pada grid 1024
+
 X0, X1 = 262, 762
 Y0, Y1 = 250, 774
-W = 120              # tebal batang
-CUT = 120            # tinggi potongan miring pada batang kanan
+W = 120              
+CUT = 120            
 
 LEFT = [(X0, Y0), (X0 + W, Y0), (X0 + W, Y1), (X0, Y1)]
 DIAG = [(X0, Y0), (X0 + W + 8, Y0), (X1, Y1), (X1 - W - 8, Y1)]
@@ -79,7 +71,7 @@ def render(size: int, *, background: bool = True, paper=PAPER, amber=AMBER,
 
 
 def tight_mark(size: int, paper=PAPER, amber=AMBER) -> Image.Image:
-    """Hanya huruf N (tanpa latar), dipotong rapat -> untuk toolbar / ikon kecil."""
+    
     img = render(1024, background=False, paper=paper, amber=amber)
     box = img.getbbox()
     img = img.crop(box)
@@ -115,7 +107,7 @@ def find_font(size: int):
 
 
 def horizontal(paper=PAPER, amber=AMBER, bg=None, height=160) -> Image.Image:
-    """Logo + tulisan NovaCode berdampingan."""
+    
     mark = render(height, background=True)
     font = find_font(int(height * 0.50))
     text_w = int(font.getlength("NovaCode"))
@@ -142,10 +134,10 @@ def main():
     frames[-1].save(os.path.join(OUT, "icon.ico"), format="ICO",
                     sizes=[(s, s) for s in sizes], append_images=frames[:-1])
 
-    # Ikon window (tk) - PNG kecil
+    
     render(64).save(os.path.join(OUT, "icon_64.png"))
 
-    # Mark tanpa latar: versi untuk tema gelap dan terang
+    
     tight_mark(256).save(os.path.join(OUT, "mark_dark.png"))
     tight_mark(256, paper="#1d1c1a", amber="#c9822a").save(os.path.join(OUT, "mark_light.png"))
 

@@ -1,4 +1,4 @@
-"""Command palette (Ctrl+Shift+P) ala VSCode."""
+
 
 from __future__ import annotations
 
@@ -46,7 +46,7 @@ class CommandPalette(ctk.CTkToplevel):
         self.list_frame.pack(fill="both", expand=True, padx=8, pady=(2, 8))
         self._render()
 
-    # ------------------------------------------------------------------
+    
     def _filter(self, event=None):
         query = self.entry.get().strip().lower()
         self.filtered = [

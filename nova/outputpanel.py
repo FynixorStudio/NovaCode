@@ -1,4 +1,4 @@
-"""Panel bawah: Terminal + Output/Log + Problems (dengan saran perbaikan)."""
+
 
 from __future__ import annotations
 
@@ -22,9 +22,9 @@ class BottomPanel(ctk.CTkFrame):
         self._drag = None
         self._build()
 
-    # ------------------------------------------------------------------
+    
     def _build(self):
-        # gagang untuk mengubah tinggi panel (drag ke atas/bawah)
+        
         grip = ctk.CTkFrame(self, height=5, fg_color=COLORS["border"],
                             corner_radius=0, cursor="sb_v_double_arrow")
         grip.pack(fill="x", side="top")
@@ -55,14 +55,14 @@ class BottomPanel(ctk.CTkFrame):
         self.body = ctk.CTkFrame(self, fg_color=COLORS["bg_deep"], corner_radius=0)
         self.body.pack(fill="both", expand=True)
 
-        # --- halaman TERMINAL ---
+        
         self.page_terminal = ctk.CTkFrame(self.body, fg_color=COLORS["bg_deep"],
                                           corner_radius=0)
         self.terminal = TerminalPanel(
             self.page_terminal, on_output=self._on_terminal_done)
         self.terminal.pack(fill="both", expand=True)
 
-        # --- halaman OUTPUT / LOG ---
+        
         self.page_output = ctk.CTkFrame(self.body, fg_color=COLORS["bg_deep"],
                                         corner_radius=0)
         head_o = ctk.CTkFrame(self.page_output, fg_color=COLORS["bg"],
@@ -87,7 +87,7 @@ class BottomPanel(ctk.CTkFrame):
         self.log_text.tag_configure("ERROR", foreground=COLORS["red"])
         self.log_text.tag_configure("HINT", foreground=COLORS["muted"])
 
-        # --- halaman PROBLEMS ---
+        
         self.page_problems = ctk.CTkFrame(self.body, fg_color=COLORS["bg_deep"],
                                           corner_radius=0)
         head_p = ctk.CTkFrame(self.page_problems, fg_color=COLORS["bg"],
@@ -125,9 +125,7 @@ class BottomPanel(ctk.CTkFrame):
             page.place(relx=0, rely=0, relwidth=1, relheight=1)
         self.select_tab("TERMINAL")
 
-    # ------------------------------------------------------------------
-    # Resize
-    # ------------------------------------------------------------------
+    
     def _start_resize(self, event):
         self._drag = (event.y_root, self.winfo_height())
 
@@ -139,9 +137,7 @@ class BottomPanel(ctk.CTkFrame):
         height = max(110, min(max_h, start_h + (start_y - event.y_root)))
         self.configure(height=height)
 
-    # ------------------------------------------------------------------
-    # Tab
-    # ------------------------------------------------------------------
+    
     def select_tab(self, name: str):
         pages = {"TERMINAL": self.page_terminal, "OUTPUT": self.page_output,
                  "PROBLEMS": self.page_problems}
@@ -161,7 +157,7 @@ class BottomPanel(ctk.CTkFrame):
             self.terminal.focus()
 
     def set_badge(self, name: str, count: int):
-        """Tandai jumlah item baru pada tab tanpa memindah fokus dari Terminal."""
+        
         btn = self.tab_buttons.get(name)
         if not btn:
             return
@@ -181,9 +177,7 @@ class BottomPanel(ctk.CTkFrame):
         else:
             self.show_terminal()
 
-    # ------------------------------------------------------------------
-    # Log & Problems
-    # ------------------------------------------------------------------
+    
     def log(self, message: str, level: str = "INFO", hint: str | None = None):
         stamp = datetime.datetime.now().strftime("%H:%M:%S")
         self.log_text.configure(state="normal")
@@ -217,7 +211,7 @@ class BottomPanel(ctk.CTkFrame):
         if self.on_problem_open and file and file != "-":
             self.on_problem_open(file, int(line) if str(line).isdigit() else 1)
 
-    # ------------------------------------------------------------------
+    
     def _on_terminal_done(self, cmd: str, output: str, code: int):
         if self.on_terminal_output:
             self.on_terminal_output(cmd, output, code)

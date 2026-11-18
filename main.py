@@ -1,9 +1,4 @@
-#!/usr/bin/env python3
-"""NovaCode — editor kode modern berbasis CustomTkinter.
 
-Jalankan:  python main.py
-Build exe: python build_exe.py
-"""
 
 from __future__ import annotations
 
@@ -60,7 +55,7 @@ WELCOME = """# NovaCode
 class NovaApp(ctk.CTk):
     def __init__(self, show_splash: bool = True):
         super().__init__()
-        # Jendela utama disembunyikan dulu; splash yang tampil lebih dulu.
+        
         self.withdraw()
         ctk.set_appearance_mode("dark")
         ctk.set_default_color_theme("blue")
@@ -72,10 +67,10 @@ class NovaApp(ctk.CTk):
         self.recent_files: list[str] = []
         self.last_folder: str | None = None
         self.open_tabs: list[str] = []
-        self.diagnostics: list = []      # hasil analisis error terakhir
+        self.diagnostics: list = []      
         self.settings_data: dict = {}
         self._load_settings()
-        self.theme_name = apply_theme(self.theme_name)   # dipakai semua widget
+        self.theme_name = apply_theme(self.theme_name)   
         ctk.set_appearance_mode("light" if is_light_theme() else "dark")
         self._tune_ctk_theme()
         icons.set_scale(self)
@@ -105,7 +100,7 @@ class NovaApp(ctk.CTk):
             self._finish_startup()
 
     def _finish_startup(self):
-        """Tampilkan jendela utama setelah splash selesai."""
+        
         self.deiconify()
         self.lift()
         self.focus_force()
@@ -116,9 +111,7 @@ class NovaApp(ctk.CTk):
         except Exception:
             pass
 
-    # ------------------------------------------------------------------
-    # UI
-    # ------------------------------------------------------------------
+    
     def _build_menu(self):
         self.menubar = tk.Menu(
             self, tearoff=0, bg=COLORS["bg_light"], fg=COLORS["text"],
@@ -185,7 +178,7 @@ class NovaApp(ctk.CTk):
         self.configure(menu=self.menubar)
 
     def _tune_ctk_theme(self):
-        """Samakan warna bawaan CustomTkinter (biru) dengan palet NovaCode."""
+        
         try:
             T = ctk.ThemeManager.theme
             c = COLORS
@@ -213,7 +206,7 @@ class NovaApp(ctk.CTk):
             pass
 
     def _set_window_icon(self):
-        """Pasang ikon NovaCode (jangan biarkan ikon default CustomTkinter)."""
+        
         ico = asset_path("icon.ico")
         if not os.path.isfile(ico):
             return
@@ -225,8 +218,8 @@ class NovaApp(ctk.CTk):
             except Exception:
                 pass
 
-        apply()       # tandai sebagai "sudah dipilih user" untuk CustomTkinter
-        # Beberapa build Windows mengganti ikon sekali lagi setelah intro.
+        apply()       
+        
         self.after(250, apply)
 
     def _set_dialog_icon(self, window):
@@ -238,7 +231,7 @@ class NovaApp(ctk.CTk):
                 pass
 
     def _brand_mark(self):
-        """Logo kecil untuk toolbar (versi gelap/terang sesuai tema)."""
+        
         try:
             from PIL import Image
             name = "mark_light.png" if is_light_theme() else "mark_dark.png"
@@ -268,7 +261,7 @@ class NovaApp(ctk.CTk):
             self.toolbar_buttons.append(widget)
             return widget
 
-        # Merek: logo + nama
+        
         brand = ctk.CTkFrame(bar, fg_color="transparent")
         brand.pack(side="left", padx=(14, 10))
         mark = self._brand_mark()
@@ -298,7 +291,7 @@ class NovaApp(ctk.CTk):
         Tooltip(run, "Jalankan file Python (F5)")
         run.pack(side="left", padx=2, pady=7)
 
-        # Asisten AI: toggle panel dock di toolbar
+        
         ai_btn = ctk.CTkButton(
             bar, text="Asisten", image=icons.ctk_icon("chat", COLORS["muted"], 15),
             compound="left", width=88, height=28, corner_radius=5,
@@ -323,7 +316,7 @@ class NovaApp(ctk.CTk):
         self.explorer.set_app(self)
         self.explorer.pack(side="left", fill="y")
 
-        # Panel AI langsung nempel di kanan, dibuat sebelum center supaya lebarnya nggak kepangan 🗿
+        
         self.ai = AIAssistant(
             self, self, self.settings_data,
             on_settings_saved=self._save_settings, master=self.main,
@@ -344,7 +337,7 @@ class NovaApp(ctk.CTk):
             if self.tabman.active_editor else None,
         )
 
-        # Panel bawah: Terminal + Output/Log + Problems (langsung terlihat)
+        
         self.bottom = BottomPanel(
             self.center, on_terminal_output=self._analyze_output, height=235)
         self.bottom.pack(fill="x", side="bottom")
@@ -378,9 +371,7 @@ class NovaApp(ctk.CTk):
         self.status_pos.pack(side="right", padx=8)
         self.status_pos.bind("<Button-1>", lambda e: self.goto_line_dialog())
 
-    # ------------------------------------------------------------------
-    # Shortcut & command palette
-    # ------------------------------------------------------------------
+    
     def _bind_shortcuts(self):
         b = self.bind_all
         b("<Control-n>", lambda e: self.new_file())
@@ -431,9 +422,7 @@ class NovaApp(ctk.CTk):
     def open_palette(self):
         CommandPalette(self, self.commands)
 
-    # ------------------------------------------------------------------
-    # File operations
-    # ------------------------------------------------------------------
+    
     def new_file(self, *args):
         self.tabman.new_file()
 
@@ -449,7 +438,7 @@ class NovaApp(ctk.CTk):
     def open_path(self, path: str):
         editor = self.tabman.open_file(path)
         if editor:
-            # File yang dibuka ulang ikut dapat penanda error yang masih aktif.
+            
             editor.show_diagnostics(self.diagnostics)
         if path not in self.recent_files:
             self.recent_files.insert(0, path)
@@ -486,9 +475,7 @@ class NovaApp(ctk.CTk):
         if editor:
             self.save_as(editor)
 
-    # ------------------------------------------------------------------
-    # Panel & aksi
-    # ------------------------------------------------------------------
+    
     def show_find(self, replace: bool):
         editor = self.tabman.active_editor
         if editor:
@@ -519,7 +506,7 @@ class NovaApp(ctk.CTk):
         self.terminal.focus()
 
     def open_problem(self, file: str, line: int):
-        """Dari panel Problems -> buka file dan arah ke barisnya."""
+        
         if os.path.isfile(file):
             self.open_path(file)
             editor = self.tabman.active_editor
@@ -585,9 +572,7 @@ class NovaApp(ctk.CTk):
             e.move_line(step); e.focus_editor()
             return "break"
 
-    # ------------------------------------------------------------------
-    # Status bar & session
-    # ------------------------------------------------------------------
+    
     def _on_cursor(self, info: dict):
         self.status_pos.configure(text=f"Ln {info['line']}, Col {info['col']}")
 
@@ -632,7 +617,7 @@ class NovaApp(ctk.CTk):
             pass
 
     def _restore_session(self):
-        # Default: tampilkan seluruh isi folder user agar langsung bisa dipilih
+        
         home = os.path.expanduser("~")
         root = self.last_folder if self.last_folder and os.path.isdir(self.last_folder) else home
         self.explorer.set_root(root)
@@ -652,17 +637,15 @@ class NovaApp(ctk.CTk):
         if opened == 0:
             self.tabman.new_file(WELCOME, "python")
 
-    # ------------------------------------------------------------------
-    # Analisis output terminal -> error di Output/Problems (Terminal tetap aktif)
-    # ------------------------------------------------------------------
+    
     def _analyze_output(self, cmd: str, output: str, code: int):
-        """Hasil run tetap di Terminal; Output/Problems hanya mencatat error."""
+        
         editor = self.tabman.active_editor
         current_file = editor.path if editor else None
 
         if code == 0:
-            # Tidak ada perpindahan tab dan tidak ada log sukses di Output.
-            # Error lama juga dibersihkan supaya tidak menyesatkan.
+            
+            
             self.diagnostics = []
             self.bottom.clear_problems()
             self.bottom.set_badge("PROBLEMS", 0)
@@ -685,22 +668,20 @@ class NovaApp(ctk.CTk):
 
         self.bottom.set_badge("PROBLEMS", len(diags))
         self._apply_diagnostics()
-        # Sengaja tidak memanggil select_tab(): fokus tetap di Terminal.
+        
 
     def _apply_diagnostics(self):
-        """Tandai semua baris error pada editor yang sedang terbuka."""
+        
         for tab in self.tabman.tabs:
             tab["editor"].show_diagnostics(self.diagnostics)
 
-    # ------------------------------------------------------------------
-    # Tema, AI, dan efek interaksi
-    # ------------------------------------------------------------------
+    
     def change_theme(self, name: str):
         if name == self.theme_name:
             return
         self.theme_name = name
         self._save_settings()
-        self._theme_restart = True   # dibaca oleh main() untuk rebuild UI
+        self._theme_restart = True   
         self.after(80, self.destroy)
 
     def _cycle_theme(self):
@@ -717,15 +698,14 @@ class NovaApp(ctk.CTk):
             self.ai.open_settings()
 
     def _apply_hover_effects(self):
-        """Sengaja kosong: hover diatur langsung oleh tiap widget dengan satu
-        gaya seragam (tanpa glow warna-warni) agar tampilan tetap tenang."""
+        
         return
 
     def on_close(self):
         self._save_settings()
         self.destroy()
 
-    # ------------------------------------------------------------------
+    
     def show_about(self):
         win = ctk.CTkToplevel(self)
         win.title(f"Tentang {APP_NAME}")
@@ -821,8 +801,8 @@ FITUR UTAMA
 
 
 def main():
-    # Theme change destroys & recreates the window with the new palette.
-    # Splash hanya diputar sekali saat aplikasi benar-benar dibuka.
+    
+    
     first_run = True
     while True:
         app = NovaApp(show_splash=first_run)

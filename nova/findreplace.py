@@ -1,4 +1,4 @@
-"""Panel Find & Replace yang muncul di atas editor."""
+
 
 from __future__ import annotations
 
@@ -64,7 +64,7 @@ class FindReplaceBar(ctk.CTkFrame):
                       width=24, height=28, fg_color="transparent",
                       hover_color=COLORS["bg_lighter"], command=self.hide).pack(side="left")
 
-        # baris replace (default tersembunyi)
+        
         self.replace_row = ctk.CTkFrame(self, fg_color="transparent")
         self.replace_entry = ctk.CTkEntry(
             self.replace_row, placeholder_text="Ganti dengan...", font=FONT_UI_TUPLE,
@@ -81,7 +81,7 @@ class FindReplaceBar(ctk.CTkFrame):
                       hover_color=COLORS["accent_hover"], text_color=COLORS["white"],
                       command=self.replace_all).pack(side="left", padx=(2, 8))
 
-    # ------------------------------------------------------------------
+    
     def attach(self, editor, replace_mode: bool = False):
         self.editor = editor
         if replace_mode:
@@ -114,7 +114,7 @@ class FindReplaceBar(ctk.CTkFrame):
             self.configure(height=68)
         self.toggle_btn.configure(text="▴" if value else "▾")
 
-    # ------------------------------------------------------------------
+    
     def _on_search_changed(self, event=None):
         if self._job:
             self.after_cancel(self._job)
@@ -157,7 +157,7 @@ class FindReplaceBar(ctk.CTkFrame):
         if not self.editor or not self.matches:
             return
         replacement = self.replace_entry.get()
-        # ganti dari belakang agar index tetap valid
+        
         for start, end in reversed(self.matches):
             self.editor.replace_one(start, end, replacement)
         self._do_search()

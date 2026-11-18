@@ -1,4 +1,4 @@
-"""Panel terminal terintegrasi (cmd / PowerShell) dengan thread aman."""
+
 
 from __future__ import annotations
 
@@ -36,7 +36,7 @@ class TerminalPanel(ctk.CTkFrame):
         self._banner()
         self.after(60, self._drain)
 
-    # ------------------------------------------------------------------
+    
     def _build_ui(self):
         header = ctk.CTkFrame(self, fg_color=COLORS["bg"], height=30,
                               corner_radius=0)
@@ -75,7 +75,7 @@ class TerminalPanel(ctk.CTkFrame):
         self.output.tag_configure("info", foreground=COLORS["cyan"])
         self.output.tag_configure("error", foreground=COLORS["red"])
 
-        # Scrollbar kelihatan jelas, jadi geser atas/bawah nggak cuma mengandalkan wheel 🗿
+        
         self.scrollbar = tk.Scrollbar(
             self, command=self.output.yview, bg=COLORS["bg_light"],
             troughcolor=COLORS["bg_deep"], activebackground=COLORS["accent"],
@@ -83,8 +83,7 @@ class TerminalPanel(ctk.CTkFrame):
         )
         self.output.configure(yscrollcommand=self.scrollbar.set)
 
-        # Pakai tk.Frame biasa dengan tinggi eksplisit: CTkFrame tidak
-        # menghormati pack_propagate(False) sehingga baris input menyusut 1px.
+        
         entry_frame = tk.Frame(self, bg=COLORS["bg_deep"], height=38)
         entry_frame.pack(fill="x", side="bottom")
         entry_frame.pack_propagate(False)
@@ -106,13 +105,11 @@ class TerminalPanel(ctk.CTkFrame):
         self.entry.bind("<Down>", self._history_down)
         self.entry.bind("<Control-c>", lambda e: self.stop())
 
-        # Output di-pack PALING TERAKHIR supaya baris input lebih dulu
-        # mendapat porsi tinggi; kalau tidak, expand=True mengambil semua
-        # ruang dan input menyusut menjadi 1px.
+        
         self.scrollbar.pack(side="right", fill="y")
         self.output.pack(side="left", fill="both", expand=True)
 
-    # ------------------------------------------------------------------
+    
     def _prompt(self) -> str:
         short = self.cwd if len(self.cwd) < 48 else "..." + self.cwd[-45:]
         return f"{short}> "
@@ -129,7 +126,7 @@ class TerminalPanel(ctk.CTkFrame):
             self.cwd = path
             self.prompt_label.configure(text=self._prompt())
 
-    # ------------------------------------------------------------------
+    
     def _write(self, text: str, tag: str | None = None):
         self.output.configure(state="normal")
         if tag:
@@ -147,7 +144,7 @@ class TerminalPanel(ctk.CTkFrame):
     def focus(self):
         self.entry.focus_set()
 
-    # ------------------------------------------------------------------
+    
     def _on_enter(self, event=None):
         cmd = self.entry.get().strip()
         self.entry.delete(0, "end")
@@ -175,12 +172,12 @@ class TerminalPanel(ctk.CTkFrame):
         return "break"
 
     def send_command(self, cmd: str):
-        """Dipakai tombol Run / fitur lain untuk mengirim perintah."""
+        
         self.entry.delete(0, "end")
         self.entry.insert(0, cmd)
         self._on_enter()
 
-    # ------------------------------------------------------------------
+    
     def execute(self, cmd: str):
         if self.running:
             self._write("Perintah masih berjalan. Tekan ■ untuk menghentikan.\n", "error")
@@ -213,14 +210,14 @@ class TerminalPanel(ctk.CTkFrame):
             return
 
         if self.shell == "powershell":
-            # EncodedCommand menghindari masalah escape tanda kutip di Windows
+            
             encoded = base64.b64encode(
                 ("& { " + cmd + " }").encode("utf-16le")).decode("ascii")
             args = ["powershell", "-NoProfile", "-EncodedCommand", encoded]
             shell = False
         else:
-            # shell=True -> cmd.exe menerima string perintah apa adanya
-            # (tanda kutip pada path tidak di-escape oleh list2cmdline)
+            
+            
             args = cmd
             shell = True
 

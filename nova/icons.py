@@ -1,30 +1,15 @@
-"""Ikon garis (line icon) yang digambar dengan Pillow.
 
-Menggantikan emoji di UI: semua ikon punya ketebalan garis, sudut, dan
-warna yang konsisten, serta mengikuti tema aktif. Tidak butuh file aset
-tambahan (Pillow sudah menjadi dependensi CustomTkinter).
-
-Pemakaian:
-    icons.ctk_icon("save", COLORS["muted"], 16)   -> untuk CTkButton(image=...)
-    icons.tk_icon("file", "#ccc", 16)             -> untuk ttk.Treeview(image=...)
-"""
 
 from __future__ import annotations
 
 from PIL import Image, ImageDraw
 
-_GRID = 24          # semua ikon didefinisikan pada grid 24x24
-_SS = 8             # supersampling supaya tepi halus
-_scale = 1.0        # skala DPI layar (diisi oleh set_scale)
-_keep: dict = {}    # referensi PhotoImage agar tidak di-garbage-collect
+_GRID = 24          
+_SS = 8             
+_scale = 1.0        
+_keep: dict = {}    
 
-# Setiap ikon = daftar operasi:
-#   ("line", [(x, y), ...])            polyline terbuka
-#   ("poly", [(x, y), ...])            polyline tertutup
-#   ("fill", [(x, y), ...])            poligon terisi
-#   ("circle", cx, cy, r)              lingkaran garis
-#   ("dot", cx, cy, r)                 lingkaran terisi
-#   ("arc", cx, cy, r, start, end)     busur (derajat, searah jarum jam dari jam 3)
+
 ICONS: dict[str, list[tuple]] = {
     "plus": [("line", [(12, 5), (12, 19)]), ("line", [(5, 12), (19, 12)])],
     "close": [("line", [(6, 6), (18, 18)]), ("line", [(18, 6), (6, 18)])],
@@ -98,7 +83,7 @@ ICONS: dict[str, list[tuple]] = {
 
 
 def set_scale(root) -> None:
-    """Ambil skala DPI dari jendela Tk (100% = 1.0, 150% = 1.5, dst.)."""
+    
     global _scale
     try:
         _scale = max(1.0, float(root.winfo_fpixels("1i")) / 96.0)
@@ -118,7 +103,7 @@ def _rgba(color: str, alpha: int = 255) -> tuple[int, int, int, int]:
 
 def render(name: str, size: int = 16, color: str = "#cccccc",
            stroke: float = 1.9) -> Image.Image:
-    """Gambar ikon ke gambar RGBA transparan berukuran size x size piksel."""
+    
     ops = ICONS.get(name) or ICONS["file"]
     big = max(8, int(size)) * _SS
     k = big / _GRID
@@ -136,7 +121,7 @@ def render(name: str, size: int = 16, color: str = "#cccccc",
             pts = pts + [pts[0]]
         for a, b in zip(pts[:-1], pts[1:]):
             d.line([a, b], fill=rgba, width=sw)
-        for x, y in pts:                      # sambungan & ujung membulat
+        for x, y in pts:                      
             d.ellipse([x - sw / 2, y - sw / 2, x + sw / 2, y + sw / 2], fill=rgba)
 
     for op in ops:
@@ -166,7 +151,7 @@ def render(name: str, size: int = 16, color: str = "#cccccc",
 
 
 def ctk_icon(name: str, color: str, size: int = 16):
-    """CTkImage untuk tombol/label CustomTkinter (otomatis ikut skala DPI)."""
+    
     import customtkinter as ctk
     key = ("ctk", name, color, size)
     if key not in _keep:
@@ -176,7 +161,7 @@ def ctk_icon(name: str, color: str, size: int = 16):
 
 
 def tk_icon(name: str, color: str, size: int = 16):
-    """PhotoImage untuk widget tk/ttk biasa (mis. Treeview)."""
+    
     from PIL import ImageTk
     px = max(8, int(round(size * _scale)))
     key = ("tk", name, color, px)

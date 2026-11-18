@@ -1,4 +1,4 @@
-"""Manajer tab: banyak file terbuka, ganti tab, simpan & tutup."""
+
 
 from __future__ import annotations
 
@@ -23,8 +23,7 @@ class TabManager(ctk.CTkFrame):
         self.active: dict | None = None
         self._counter = 0
 
-        # Tab bar bisa di-scroll horizontal supaya semua file yang pernah dibuka
-        # tetap bisa diklik walau jumlahnya melebihi lebar jendela.
+        
         self.tabbar = ctk.CTkFrame(self, height=38, fg_color=COLORS["bg"],
                                    corner_radius=0)
         self.tabbar.pack(fill="x", side="top")
@@ -41,11 +40,11 @@ class TabManager(ctk.CTkFrame):
         self.tab_canvas.bind("<Configure>", lambda e: self._update_tab_scroll())
         self.tab_canvas.bind("<MouseWheel>", self._tab_mousewheel)
         self.tabbar.bind("<MouseWheel>", self._tab_mousewheel)
-        # Fallback: klik pada area kosong tab bar tetap memilih tab yang
-        # berada di bawah kursor (mis. saat event tidak sampai ke kartu).
+        
+        
         self.tab_canvas.bind("<Button-1>", self._on_tabbar_click, add="+")
         self.tab_canvas.bind("<ButtonPress-1>", self._on_tabbar_click, add="+")
-        # Klik sekali langsung pindah tab, biasanya CTk nyumat event pertama 🗿
+        
         self.winfo_toplevel().bind(
             "<ButtonPress-1>", self._on_global_tab_press, add="+")
 
@@ -54,24 +53,18 @@ class TabManager(ctk.CTkFrame):
         self.content = ctk.CTkFrame(self, fg_color=COLORS["bg_deep"], corner_radius=0)
         self.content.pack(fill="both", expand=True)
 
-        # host untuk panel Find & Replace (dipakai aplikasi utama).
-        # Pakai tk.Frame dengan tinggi 0: CTkFrame punya tinggi default 200px
-        # yang akan menutupi bagian atas editor saat masih kosong.
+        
         self.find_host = tk.Frame(self.content, bg=COLORS["bg_deep"], height=0)
         self.find_host.pack(fill="x", side="top")
 
-    # ------------------------------------------------------------------
-    # Property
-    # ------------------------------------------------------------------
+    
     @property
     def active_editor(self) -> CodeEditor | None:
         return self.active["editor"] if self.active else None
 
-    # ------------------------------------------------------------------
-    # Scroll tabbar
-    # ------------------------------------------------------------------
+    
     def _update_tab_scroll(self):
-        """Sesuaikan area scroll dan pastikan tab aktif tetap terlihat."""
+        
         if not hasattr(self, "tab_canvas"):
             return
         self.tab_strip.update_idletasks()
@@ -90,7 +83,7 @@ class TabManager(ctk.CTkFrame):
             return
         left, right = frame.winfo_x(), frame.winfo_x() + frame.winfo_width()
         view_l, view_r = self.tab_canvas.xview()
-        # xview() adalah fraksi dari scrollregion, bukan piksel absolut.
+        
         visible_l = x0 + view_l * total
         visible_r = x0 + view_r * total
         if left < visible_l:
@@ -99,22 +92,14 @@ class TabManager(ctk.CTkFrame):
             self.tab_canvas.xview_moveto(max(0, right - x0 - canvas_w + 8) / total)
 
     def _tab_mousewheel(self, event):
-        # scroll horizontal memakai mouse wheel biasa di Windows/macOS
+        
         step = -1 if getattr(event, "delta", 0) > 0 else 1
         self.tab_canvas.xview_scroll(step, "units")
         return "break"
 
-    # ------------------------------------------------------------------
-    # Klik kartu tab
-    # ------------------------------------------------------------------
+    
     def _bind_tab_click(self, widget, tab: dict, recursive: bool = False):
-        """Ikat klik kartu ke widget (dan opsional seluruh turunannya).
-
-        CustomTkinter 5.x menyimpan binding langsung di widget, sedangkan
-        6.x memakai canvas internal. Mengikat semua lapisan dengan ``add="+"``
-        membuat klik tetap bekerja pada kedua versi tanpa menimpa binding
-        yang sudah ada (mis. tooltip / tombol close).
-        """
+        
         try:
             widget.bind("<Button-1>", lambda e, t=tab: self.select(t), add="+")
         except Exception:
@@ -129,7 +114,7 @@ class TabManager(ctk.CTkFrame):
             self._bind_tab_click(child, tab, recursive=True)
 
     def _on_tabbar_click(self, event):
-        """Fallback: tentukan tab dari koordinat bila klik kena canvas kosong."""
+        
         if event.widget is not self.tab_canvas:
             return
         x = self.tab_canvas.canvasx(event.x)
@@ -144,7 +129,7 @@ class TabManager(ctk.CTkFrame):
                 break
 
     def _on_global_tab_press(self, event):
-        """Tangkap klik di kartu tab dari lapisan mana pun (CTk sering nahan klik pertama)."""
+        
         widget = event.widget
         jump = 0
         try:
@@ -156,7 +141,7 @@ class TabManager(ctk.CTkFrame):
         if widget is not self.tab_strip:
             return
 
-        # Tombol close sengaja dikecualin supaya kliknya tetap buang tab, bukan pindah tab.
+        
         for tab in self.tabs:
             close = tab.get("close")
             if close is None or not close.winfo_exists():
@@ -177,9 +162,7 @@ class TabManager(ctk.CTkFrame):
                 self.select(tab)
                 break
 
-    # ------------------------------------------------------------------
-    # Operasi tab
-    # ------------------------------------------------------------------
+    
     def open_file(self, path: str) -> CodeEditor | None:
         path = os.path.abspath(os.path.normpath(path))
         for tab in self.tabs:
@@ -228,7 +211,7 @@ class TabManager(ctk.CTkFrame):
         )
         label.pack(side="left", fill="y")
 
-        # pemisah tipis di sisi kanan tab
+        
         separator = tk.Frame(frame, bg=COLORS["border"], width=1)
         separator.pack(side="right", fill="y")
 
@@ -240,14 +223,12 @@ class TabManager(ctk.CTkFrame):
         )
         close.pack(side="right", padx=(2, 6), pady=6)
 
-        # Klik di seluruh kartu (teks, separator, area kosong, atau child
-        # internal CustomTkinter) harus memindah tab. Tombol close sengaja
-        # tidak ikut diikat supaya command-nya tetap berfungsi.
+        
         self._bind_tab_click(frame, tab)
         self._bind_tab_click(label, tab, recursive=True)
         self._bind_tab_click(separator, tab)
 
-        # Garis aksen tipis; hanya tampil pada tab aktif (diatur di select())
+        
         indicator = tk.Frame(frame, bg=COLORS["accent"], height=2)
         tab["indicator"] = indicator
 
@@ -330,9 +311,7 @@ class TabManager(ctk.CTkFrame):
         idx = (self.tabs.index(self.active) + step) % len(self.tabs)
         self.select(self.tabs[idx])
 
-    # ------------------------------------------------------------------
-    # Callbacks internal
-    # ------------------------------------------------------------------
+    
     def _editor_changed(self, editor: CodeEditor):
         tab = getattr(editor, "tab", None)
         if tab:

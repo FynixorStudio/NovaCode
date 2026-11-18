@@ -1,9 +1,4 @@
-"""Splash screen beranimasi untuk NovaCode.
 
-Menampilkan logo saat aplikasi disiapkan, lalu menyerahkan layar ke jendela
-utama. Memakai tkinter murni + Pillow (sudah jadi dependensi), tanpa modul
-atau aset baru.
-"""
 
 from __future__ import annotations
 
@@ -29,7 +24,7 @@ _STEPS = (
 
 
 class SplashScreen(tk.Toplevel):
-    """Jendela splash tanpa bingkai yang fade-in, memudar, lalu menutup diri."""
+    
 
     def __init__(self, parent, on_done=None, duration: float = 4.2):
         super().__init__(parent)
@@ -65,7 +60,7 @@ class SplashScreen(tk.Toplevel):
         self.withdraw()
         self.update_idletasks()
 
-    # ------------------------------------------------------------------
+    
     def _center(self):
         sw, sh = self.winfo_screenwidth(), self.winfo_screenheight()
         self.geometry(f"{_W}x{_H}+{(sw - _W) // 2}+{(sh - _H) // 2}")
@@ -98,7 +93,7 @@ class SplashScreen(tk.Toplevel):
                       text=f"{user_name()}  ·  v{APP_VERSION}     •     klik untuk lewati",
                       fill=COLORS["muted"], font=("Segoe UI", 9))
 
-    # ------------------------------------------------------------------
+    
     def start(self):
         self.deiconify()
         self.lift()
@@ -107,7 +102,7 @@ class SplashScreen(tk.Toplevel):
         self._tick()
 
     def skip(self):
-        """Lewati animasi, tapi tetap tutup dengan fade singkat."""
+        
         if not self._finished:
             self._start = time.monotonic() - (self._duration - 0.30)
             self._tick()
@@ -119,7 +114,7 @@ class SplashScreen(tk.Toplevel):
         p = min(1.0, elapsed / self._duration)
         ease = 1 - (1 - p) ** 3
 
-        # Fade masuk 0.28 dtk, fade keluar 0.34 dtk.
+        
         fade_in = min(1.0, elapsed / 0.28)
         fade_out = (1.0 if elapsed < self._duration - 0.34
                     else max(0.0, (self._duration - elapsed) / 0.34))
@@ -128,7 +123,7 @@ class SplashScreen(tk.Toplevel):
         except Exception:
             pass
 
-        # Logo membesar halus + sedikit melayang.
+        
         grow = 1 - (1 - min(1.0, p * 1.6)) ** 3
         size = int(60 + 42 * grow + 1.6 * math.sin(elapsed * 6))
         if self._logo_src is not None:
@@ -136,13 +131,13 @@ class SplashScreen(tk.Toplevel):
                 photo = ImageTk.PhotoImage(
                     self._logo_src.resize((size, size), Image.LANCZOS))
                 self.canvas.itemconfigure(self._logo, image=photo)
-                # Referensi lama dilepas setelah canvas selesai memakainya.
+                
                 self._logo_photo = photo
                 self.canvas.coords(self._logo, _CX, 84)
             except Exception:
                 pass
 
-        # Cincin cahaya berdenyut di belakang logo.
+        
         beat = 0.5 + 0.5 * math.sin(elapsed * 4.2)
         r = 60 + 5 * math.sin(elapsed * 4.2)
         self.canvas.coords(self._glow, _CX - r, 84 - r, _CX + r, 84 + r)
@@ -151,7 +146,7 @@ class SplashScreen(tk.Toplevel):
         r2 = r + 9
         self.canvas.coords(self._halo, _CX - r2, 84 - r2, _CX + r2, 84 + r2)
 
-        # Progress bar + teks status.
+        
         self.canvas.coords(self._bar, 80, 222, 80 + 360 * ease, 222)
         label = _STEPS[0][1]
         for threshold, text in _STEPS:

@@ -1,9 +1,4 @@
-"""Asisten AI di panel kanan: model GGUF lokal atau provider API cloud.
 
-Semua request memakai urllib (stdlib), jadi tidak perlu install requests.
-Model GGUF lokal dijalankan lewat llama-cpp-python bila tersedia, atau
-pengguna bisa mengarahkan ke server LM Studio / llama.cpp / Ollama.
-"""
 
 from __future__ import annotations
 
@@ -83,7 +78,7 @@ SYSTEM_PROMPT = (
 
 
 class AIAssistant:
-    """Mengelola panel chat yang nempel di sisi kanan editor."""
+    
 
     def __init__(self, root, app, settings: dict, on_settings_saved=None, master=None):
         self.root = root
@@ -105,15 +100,15 @@ class AIAssistant:
         self._build_panel()
         self.root.after(80, self._drain)
 
-    # ------------------------------------------------------------------
+    
     def _ai(self) -> dict:
         cfg = dict(DEFAULT_AI)
         cfg.update(self.settings.get("ai", {}))
         return cfg
 
-    # ------------------------------------------------------------------
+    
     def _build_panel(self):
-        # Panel ini jadi bagian layout (bukan overlay), jadi warnanya ikut tema.
+        
         self.panel = ctk.CTkFrame(
             self.master, width=self._panel_width, corner_radius=0,
             fg_color=COLORS["bg"], border_width=1, border_color=COLORS["border"],
@@ -221,7 +216,7 @@ class AIAssistant:
         )
         self._refresh_badge()
 
-    # ------------------------------------------------------------------
+    
     def _refresh_badge(self):
         cfg = self._ai()
         provider = cfg["provider"]
@@ -234,7 +229,7 @@ class AIAssistant:
             self.on_settings_saved()
 
     def _on_return(self, event):
-        if event.state & 0x0001:  # Shift+Enter -> baris baru
+        if event.state & 0x0001:  
             return
         self.send()
         return "break"
@@ -244,9 +239,9 @@ class AIAssistant:
         self.entry.insert("1.0", prompt)
         self.send()
 
-    # ------------------------------------------------------------------
+    
     def attach_file(self):
-        """Lampiran ala chat AI: teks dibaca isinya, gambar dikirim sebagai gambar."""
+        
         path = filedialog.askopenfilename(
             title="Lampirkan file ke asisten",
             filetypes=[
@@ -307,7 +302,7 @@ class AIAssistant:
         self.attach_chip.configure(text=label)
 
     def _request_pieces(self, text: str):
-        """Ubah lampiran jadi bagian request, tanpa nyimpan file di history."""
+        
         if not self._attach:
             return text, []
         name = os.path.basename(self._attach["path"])
@@ -325,7 +320,7 @@ class AIAssistant:
 
     @staticmethod
     def _plain_content(content):
-        """GGUF cuma baca teks, jadi gambar diterjemahkan jadi catatan."""
+        
         if isinstance(content, str):
             return content
         chunks = []
@@ -338,7 +333,7 @@ class AIAssistant:
 
     @staticmethod
     def _gemini_parts(content):
-        """Gemini pakai inline_data buat gambar, OpenAI pakai image_url."""
+        
         if isinstance(content, str):
             return [{"text": content}]
         parts = []
@@ -355,7 +350,7 @@ class AIAssistant:
                     parts.append({"text": f"[gambar: {url}]"})
         return parts
 
-    # ------------------------------------------------------------------
+    
     def toggle(self):
         if self.visible:
             self.hide()
@@ -392,7 +387,7 @@ class AIAssistant:
         animation.cancel(self.panel, "dock")
         self.panel.pack_forget()
 
-    # ------------------------------------------------------------------
+    
     def _add_message(self, role: str, text: str):
         row = ctk.CTkFrame(self.messages, fg_color="transparent")
         row.pack(fill="x", pady=3, padx=2)
@@ -434,7 +429,7 @@ class AIAssistant:
             editor.text.insert("insert", text)
             editor.focus_editor()
 
-    # ------------------------------------------------------------------
+    
     def _show_typing(self, value: bool):
         self._typing = value
         if value:
@@ -452,7 +447,7 @@ class AIAssistant:
                           else COLORS["muted"])
         self.root.after(220, self._animate_dots)
 
-    # ------------------------------------------------------------------
+    
     def send(self):
         text = self.entry.get("1.0", "end").strip()
         if not text or self._typing:
@@ -504,7 +499,7 @@ class AIAssistant:
             pass
         self.root.after(80, self._drain)
 
-    # ------------------------------------------------------------------
+    
     def _call_api(self, messages: list[dict]) -> str:
         cfg = self._ai()
         provider = cfg["provider"]
@@ -582,7 +577,7 @@ class AIAssistant:
         if self._llm is None or self._llm_path != path:
             self._llm = Llama(model_path=path, n_ctx=2048, verbose=False)
             self._llm_path = path
-        # GGUF lokal belum ngerti gambar, jadi content-list diagu jadi teks dulu.
+        
         messages = [
             {"role": msg["role"], "content": self._plain_content(msg["content"])}
             for msg in messages
@@ -603,7 +598,7 @@ class AIAssistant:
             body = exc.read().decode("utf-8", "replace")
             raise ValueError(f"HTTP {exc.code}: {body[:300]}")
 
-    # ------------------------------------------------------------------
+    
     def open_settings(self):
         AISettingsDialog(
             self.root, self.settings,

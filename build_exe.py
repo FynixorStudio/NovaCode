@@ -1,12 +1,4 @@
-#!/usr/bin/env python3
-"""Build NovaCode menjadi file .exe Windows menggunakan PyInstaller.
 
-Cara pakai:
-    python build_exe.py
-
-Output:
-    dist/NovaCode.exe
-"""
 
 from __future__ import annotations
 
@@ -16,7 +8,7 @@ import sys
 
 
 def cleanup_old(here: str) -> None:
-    """Hentikan instance lama & hapus exe lama agar rebuild tidak gagal."""
+    
     if os.name == "nt":
         subprocess.run(
             ["taskkill", "/F", "/IM", "NovaCode.exe"],
@@ -32,7 +24,7 @@ def cleanup_old(here: str) -> None:
 
 def ensure_pyinstaller() -> None:
     try:
-        import PyInstaller  # noqa: F401
+        import PyInstaller  
     except ImportError:
         print("PyInstaller belum terpasang. Menginstall...")
         subprocess.check_call([sys.executable, "-m", "pip", "install", "pyinstaller"])
@@ -48,8 +40,8 @@ def main() -> None:
         sys.executable, "-m", "PyInstaller",
         "--noconfirm",
         "--clean",
-        "--windowed",          # tanpa console hitam
-        "--onefile",           # satu file .exe
+        "--windowed",          
+        "--onefile",           
         "--name", "NovaCode",
         "--collect-data", "customtkinter",
         "--collect-submodules", "customtkinter",
@@ -57,7 +49,7 @@ def main() -> None:
     ]
     assets = os.path.join(here, "assets")
     if os.path.isdir(assets):
-        # logo & ikon dibaca saat runtime (nova.config.asset_path)
+        
         cmd += ["--add-data", f"{assets}{os.pathsep}assets"]
     if os.path.isfile(icon):
         cmd += ["--icon", icon]

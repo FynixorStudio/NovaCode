@@ -1,4 +1,4 @@
-"""Widget kecil pendukung UI (tooltip)."""
+
 
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ from .config import COLORS
 
 
 class Tooltip:
-    """Tooltip sederhana: muncul setelah kursor diam sebentar di atas widget."""
+    
 
     def __init__(self, widget, text: str, delay: int = 450):
         self.widget = widget

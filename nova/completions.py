@@ -1,10 +1,4 @@
-"""Mesin autocomplete per bahasa untuk NovaCode.
 
-Kamus kata kunci, builtin, metode, dan snippet dikelompokkan per bahasa.
-Popup menyaring daftar mengikuti prefix yang diketik (f -> semua yang diawali f,
-fal -> lebih sedikit, False -> almost exact) dan menampilkan keterangan singkat
-untuk item yang dipilih. Tidak bergantung pada paket eksternal.
-"""
 
 from __future__ import annotations
 
@@ -12,7 +6,7 @@ from dataclasses import dataclass
 
 from .config import COMMON_WORDS, language_label
 
-# kind -> label pendek yang ditampilkan di bawah popup
+
 KIND_LABEL = {
     "keyword": "kata kunci",
     "builtin": "bawaan",
@@ -31,7 +25,7 @@ KIND_LABEL = {
     "word": "kata di dokumen",
 }
 
-# Urutan prioritas saat hasil difilter (lebih kecil = lebih atas).
+
 _KIND_RANK = {
     "snippet": 0, "keyword": 1, "builtin": 2, "function": 3, "method": 4,
     "type": 5, "constant": 6, "module": 7, "tag": 8, "attr": 9,
@@ -44,7 +38,7 @@ class Item:
     word: str
     kind: str = "keyword"
     detail: str = ""
-    insert: str | None = None       # teks final; {cursor} = posisi kursor
+    insert: str | None = None       
 
 
 def _words(words: str, kind: str, detail: str = "") -> list[Item]:
@@ -55,9 +49,6 @@ def _snip(word: str, insert: str, detail: str) -> Item:
     return Item(word, "snippet", detail, insert)
 
 
-# ---------------------------------------------------------------------------
-# Tambahan per bahasa. Keyword/builtin dasar tetap diambil dari config.py.
-# ---------------------------------------------------------------------------
 EXTRA: dict[str, list[Item]] = {
     "python": [
         *_words("""append extend insert pop remove clear index count sort reverse copy
@@ -268,12 +259,11 @@ EXTRA: dict[str, list[Item]] = {
 }
 
 
-# ---------------------------------------------------------------------------
 _cache: dict[str, list[Item]] = {}
 
 
 def items_for(language: str) -> list[Item]:
-    """Semua item yang tersedia untuk suatu bahasa (di-cache per bahasa)."""
+    
     lang = language if language in COMMON_WORDS else "text"
     if lang in _cache:
         return _cache[lang]
@@ -295,7 +285,7 @@ def items_for(language: str) -> list[Item]:
 
 def get_completions(language: str, prefix: str = "", document_words=(),
                     limit: int = 14) -> list[Item]:
-    """Saring item berdasarkan prefix; hasil paling relevan di depan."""
+    
     pool = list(items_for(language))
     seen = {it.word.lower() for it in pool}
     for word in document_words:
@@ -319,7 +309,7 @@ def get_completions(language: str, prefix: str = "", document_words=(),
 
 
 def describe(item: Item, language: str) -> str:
-    """Teks bantuan singkat yang tampil di bawah popup."""
+    
     label = KIND_LABEL.get(item.kind, item.kind)
     detail = item.detail or label
     if item.kind == "word":

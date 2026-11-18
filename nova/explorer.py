@@ -1,4 +1,4 @@
-"""Panel file explorer (treeview folder kiri)."""
+
 
 from __future__ import annotations
 
@@ -12,7 +12,7 @@ import customtkinter as ctk
 from . import icons
 from .config import COLORS, FONT_UI_TUPLE, TOKEN_COLORS, language_for
 
-# Warna ikon file per bahasa (mengambil warna token syntax tema aktif)
+
 LANG_COLOR = {
     "python": "type", "javascript": "number", "typescript": "function",
     "java": "keyword", "cpp": "function", "c": "function", "go": "builtin",
@@ -34,7 +34,7 @@ class FileExplorer(ctk.CTkFrame):
         self._build_ui()
         self._build_menu()
 
-    # ------------------------------------------------------------------
+    
     def _build_style(self):
         style = ttk.Style()
         try:
@@ -89,7 +89,7 @@ class FileExplorer(ctk.CTkFrame):
             command=self.refresh,
         ).pack(side="right", padx=2)
 
-        # Pemilih root: langsung tampilkan semua file user, atau pilih folder tertentu
+        
         roots = ctk.CTkFrame(self, fg_color="transparent")
         roots.pack(fill="x", padx=8, pady=(4, 2))
         ctk.CTkButton(
@@ -162,7 +162,7 @@ class FileExplorer(ctk.CTkFrame):
         self.menu.add_command(label="Salin path", command=self._copy_path)
         self.menu.add_command(label="Hapus", command=self._delete)
 
-    # ------------------------------------------------------------------
+    
     def set_root(self, path: str):
         self.root_path = path
         name = os.path.basename(path.rstrip("\\/")) or path
@@ -171,7 +171,7 @@ class FileExplorer(ctk.CTkFrame):
         self.refresh()
 
     def go_home(self):
-        """Tampilkan seluruh isi folder user (C:\\Users\\<nama>) langsung."""
+        
         home = os.path.expanduser("~")
         self.set_root(home)
         if self.app_ref:
@@ -218,13 +218,13 @@ class FileExplorer(ctk.CTkFrame):
             return
         entries.sort(key=lambda e: (not e.is_dir(), e.name.lower()))
         for entry in entries:
-            # Semua file/folder ditampilkan, termasuk yang tersembunyi,
-            # supaya user bisa langsung memilih dan mengedit apa saja.
+            
+            
             if entry.is_dir():
                 item = self.tree.insert(parent, "end", text=" " + entry.name,
                                         image=self._img_folder)
                 self.paths[item] = entry.path
-                # dummy child agar arrow expand muncul
+                
                 self.tree.insert(item, "end", text="")
             else:
                 lang = language_for(entry.name)
@@ -237,7 +237,7 @@ class FileExplorer(ctk.CTkFrame):
         path = self.paths.get(item)
         if not path or not os.path.isdir(path):
             return
-        # hapus semua children lalu isi ulang (termasuk dummy)
+        
         for child in self.tree.get_children(item):
             self.tree.delete(child)
         self._populate(item, path)
@@ -251,9 +251,7 @@ class FileExplorer(ctk.CTkFrame):
             if self.on_open_file:
                 self.on_open_file(path)
 
-    # ------------------------------------------------------------------
-    # Context menu actions
-    # ------------------------------------------------------------------
+    
     def _selected_path(self):
         item = self.tree.focus()
         return self.paths.get(item), item

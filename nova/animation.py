@@ -1,4 +1,4 @@
-"""Animasi ringan & efek hover untuk widget CustomTkinter (tanpa dependency)."""
+
 
 from __future__ import annotations
 
@@ -29,7 +29,7 @@ def mix(color_a, color_b, t: float) -> str:
 
 
 def _solid(color):
-    """'transparent' tidak bisa di-interpolasi; pakai warna panel sebagai ganti."""
+    
     if isinstance(color, (tuple, list)):
         color = color[0] if color else None
     if not isinstance(color, str) or not color.startswith("#"):
@@ -39,11 +39,7 @@ def _solid(color):
 
 def animate(widget, setter, start: float, end: float, duration: int = 220,
             steps: int = 12, on_done=None, channel: str = "default"):
-    """Animasi angka generik (posisi, alpha, warna, dll).
-
-    channel memisahkan token antar animasi pada widget yang sama, supaya
-    animasi posisi tidak mengganggu animasi warna (dan sebaliknya).
-    """
+    
     attr = f"_nova_anim_{channel}"
     token = getattr(widget, attr, 0) + 1
     setattr(widget, attr, token)
@@ -52,7 +48,7 @@ def animate(widget, setter, start: float, end: float, duration: int = 220,
         if getattr(widget, attr, 0) != token:
             return
         t = i / steps
-        eased = 1 - (1 - t) ** 3          # ease-out cubic
+        eased = 1 - (1 - t) ** 3          
         value = start + (end - start) * eased
         try:
             setter(value)
@@ -71,7 +67,7 @@ def animate_color(widget, start, end, duration: int = 180, on_done=None,
     a, b = _solid(start), _solid(end)
 
     def setter(value):
-        # value adalah 0..1 -> pakai mix di sini
+        
         widget.configure(**{key: mix(a, b, value)})
 
     return animate(widget, setter, 0.0, 1.0, duration=duration,
@@ -80,7 +76,7 @@ def animate_color(widget, start, end, duration: int = 180, on_done=None,
 
 def add_hover(widget, normal=None, hover=None, duration: int = 150,
               glow: bool = True):
-    """Efek hover: transisi warna + opsional border glow."""
+    
     try:
         current = widget.cget("fg_color")
     except Exception:
@@ -116,7 +112,7 @@ def add_hover(widget, normal=None, hover=None, duration: int = 150,
 
 
 def pulse(widget, color_a, color_b, duration: int = 900):
-    """Efek denyut berulang (untuk tombol AI / indikator)."""
+    
     token = getattr(widget, "_nova_pulse", 0) + 1
     widget._nova_pulse = token
     a, b = _solid(color_a), _solid(color_b)
@@ -138,7 +134,7 @@ def stop_pulse(widget):
 
 
 def cancel(widget, *channels: str):
-    """Mematikan animasi yang sedang berjalan pada channel tertentu."""
+    
     for channel in channels:
         attr = f"_nova_anim_{channel}"
         setattr(widget, attr, getattr(widget, attr, 0) + 1)
@@ -158,5 +154,5 @@ def fade_window(window, start: float = 0.0, end: float = 1.0,
 
 
 def slide(widget, setter, start: float, end: float, duration: int = 280):
-    """Bantu animasi geser panel (setter menerima nilai posisi)."""
+    
     return animate(widget, setter, start, end, duration=duration)

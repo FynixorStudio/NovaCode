@@ -1,4 +1,4 @@
-"""Widget editor kode: teks + nomor baris + highlight + autocomplete."""
+
 
 from __future__ import annotations
 
@@ -11,13 +11,13 @@ from .completions import describe, get_completions
 from .config import COLORS, COMMON_WORDS, FONT_MONO_TUPLE, language_for
 from .syntax import SyntaxHighlighter, configure_tags
 
-# Pasangan karakter yang ditutup otomatis saat diketik.
+
 PAIRS = {"(": ")", "[": "]", "{": "}", '"': '"', "'": "'", "`": "`"}
 CLOSERS = set(PAIRS.values())
 
 
 class CodeEditor(tk.Frame):
-    """Satu dokumen aktif dengan semua fitur editing dasar."""
+    
 
     def __init__(self, master, path: str | None = None, on_change=None,
                  on_cursor=None, app=None):
@@ -32,7 +32,7 @@ class CodeEditor(tk.Frame):
         self._highlight_job = None
         self._ac_job = None
         self._suppress_complete_once = False
-        self._completion = None          # dict dengan info popup
+        self._completion = None          
         self._current_line_tag = None
         self._last_cursor = "1.0"
         self._highlighter = SyntaxHighlighter()
@@ -47,9 +47,7 @@ class CodeEditor(tk.Frame):
         if path and os.path.isfile(path):
             self.load(path)
 
-    # ------------------------------------------------------------------
-    # Konstruksi UI
-    # ------------------------------------------------------------------
+    
     def _build_widgets(self):
         bg = COLORS["bg_deep"]
         self.columnconfigure(1, weight=1)
@@ -106,7 +104,7 @@ class CodeEditor(tk.Frame):
         t.bind("<ButtonRelease-1>", lambda e: self._update_cursor())
         t.bind("<Control-Home>", lambda e: self._go_start())
         t.bind("<Control-End>", lambda e: self._go_end())
-        # klik di mana saja menutup popup autocomplete
+        
         self.winfo_toplevel().bind("<Button-1>", lambda e: self._close_completion(), add="+")
 
     def _yview(self, *args):
@@ -114,16 +112,14 @@ class CodeEditor(tk.Frame):
         self.gutter.yview(*args)
 
     def _yscroll(self, *args):
-        # yscrollcommand dipanggil Tk dengan dua fraksi, bukan perintah "moveto"
+        
         self.vbar.set(*args)
         if args:
             self.gutter.yview("moveto", args[0])
 
-    # ------------------------------------------------------------------
-    # Konten & file
-    # ------------------------------------------------------------------
+    
     def load(self, path: str):
-        """Baca file ke editor. Dipakai saat membuka file dari explorer/dialog."""
+        
         self.path = path
         self.language = language_for(path)
         try:
@@ -184,9 +180,7 @@ class CodeEditor(tk.Frame):
         self._notify_change()
         return True
 
-    # ------------------------------------------------------------------
-    # Event editing
-    # ------------------------------------------------------------------
+    
     def _on_modified(self, event=None):
         if not self.text.edit_modified():
             return
@@ -202,9 +196,7 @@ class CodeEditor(tk.Frame):
         if self.on_change:
             self.on_change(self)
 
-    # ------------------------------------------------------------------
-    # Penanda error dari panel Problems
-    # ------------------------------------------------------------------
+    
     def clear_diagnostics(self):
         self.text.tag_remove("diagnostic", "1.0", "end")
         self.gutter.configure(state="normal")
@@ -212,7 +204,7 @@ class CodeEditor(tk.Frame):
         self.gutter.configure(state="disabled")
 
     def show_diagnostics(self, diags):
-        """Tandai semua baris yang disebut diagnostik untuk file ini."""
+        
         self.clear_diagnostics()
         if not self.path:
             return
@@ -255,7 +247,7 @@ class CodeEditor(tk.Frame):
         line = int(index.split(".")[0])
         col = int(index.split(".")[1]) + 1
 
-        # sorot baris aktif
+        
         if self._current_line_tag:
             self.text.tag_remove("currentline", *self._current_line_tag)
         self._current_line_tag = (f"{line}.0", f"{line}.end")
@@ -264,11 +256,9 @@ class CodeEditor(tk.Frame):
         if self.on_cursor:
             self.on_cursor({"line": line, "col": col, "editor": self})
 
-    # ------------------------------------------------------------------
-    # Shortcut & perilaku editor
-    # ------------------------------------------------------------------
+    
     def _on_key_press(self, event):
-        # popup autocomplete sedang aktif -> kendalikan navigasi
+        
         if self._completion and event.keysym in ("Up", "Down", "Tab", "Return", "Escape"):
             return self._completion_key(event)
 
@@ -276,7 +266,7 @@ class CodeEditor(tk.Frame):
         shift = event.state & 0x0001
         alt = event.state & 0x0008
 
-        # Tutup pasangan (), [], {}, '', "", `` secara otomatis.
+        
         if not ctrl and not alt:
             paired = self._auto_pair(event)
             if paired is not None:
@@ -309,11 +299,11 @@ class CodeEditor(tk.Frame):
         return None
 
     def _auto_pair(self, event):
-        """Ketik pembuka -> pasangan langsung muncul; klik penutup ->lewati."""
+        
         t = self.text
         keysym = event.keysym
 
-        # Hapus pasangan kosong sekaligus: (|) / ()| + BackSpace/Delete -> |
+        
         if keysym in ("BackSpace", "Delete"):
             index = t.index("insert")
             if keysym == "BackSpace" and index == "1.0":
@@ -321,7 +311,7 @@ class CodeEditor(tk.Frame):
             prev = t.get("insert-1c", "insert")
             nxt = t.get("insert", "insert+1c")
 
-            # Blok tiga tanda kutip kosong: """|""" -> hapus enam character.
+            
             if (prev in "\"'" and nxt == prev
                     and t.get("insert-3c", "insert") == prev * 3
                     and t.get("insert", "insert+3c") == prev * 3):
@@ -343,7 +333,7 @@ class CodeEditor(tk.Frame):
         if not ch or len(ch) != 1:
             return None
 
-        # Mengetik penutup yang sudah ada di depan kursor -> lewati saja.
+        
         if ch in CLOSERS:
             nxt = t.get("insert", "insert+1c")
             if nxt == ch:
@@ -353,12 +343,11 @@ class CodeEditor(tk.Frame):
         opening = PAIRS.get(ch)
         if not opening:
             return None
-        # Apostrof di dalam string/komentar sebaiknya tidak dipasangkan.
+        
         if ch in "\"'`" and self._inside_comment_or_string():
             return None
 
-        # Tiga tanda kutip beruntun -> blok docstring/string panjang.
-        # Dua kutip sudah ada di dokumen; tambah 1 pembuka + 3 penutup.
+        
         if ch in "\"'" and t.get("insert-2c", "insert") == ch * 2:
             t.insert("insert", ch * 4)
             t.mark_set("insert", "insert-3c")
@@ -393,7 +382,7 @@ class CodeEditor(tk.Frame):
         line_text = t.get(f"{line_index}.0", f"{line_index}.end")
         indent = re.match(r"[ \t]*", line_text).group(0)
 
-        # Enter di dalam pasangan kosong -> buat 3 baris rapi dengan indentasi.
+        
         prev = t.get("insert-1c", "insert") if index != "1.0" else ""
         nxt = t.get("insert", "insert+1c")
         if prev in PAIRS and PAIRS[prev] == nxt:
@@ -512,9 +501,7 @@ class CodeEditor(tk.Frame):
         self.text.see("end-1c")
         self._update_cursor()
 
-    # ------------------------------------------------------------------
-    # Cari & ganti (dipakai FindReplaceBar)
-    # ------------------------------------------------------------------
+    
     def find_all(self, needle: str, case_sensitive: bool = False,
                  whole_word: bool = False):
         if not needle:
@@ -550,9 +537,7 @@ class CodeEditor(tk.Frame):
         self.text.delete(start, end)
         self.text.insert(start, replacement)
 
-    # ------------------------------------------------------------------
-    # Autocomplete
-    # ------------------------------------------------------------------
+    
     def _collect_words(self) -> set[str]:
         if not self._word_cache_dirty:
             return self._word_cache
@@ -561,7 +546,7 @@ class CodeEditor(tk.Frame):
         words.update(w for w in langdef["keywords"] if len(w) >= 2)
         words.update(w for w in langdef["builtins"] if len(w) >= 2)
         content = self.get_content()
-        # ambil juga identifier yang sudah ada di dokumen
+        
         words.update(w for w in re.findall(r"[A-Za-z_]\w{2,}", content))
         self._word_cache = {w for w in words if len(w) >= 2}
         self._word_cache_dirty = False
@@ -576,7 +561,7 @@ class CodeEditor(tk.Frame):
         return m.group(0) if m else ""
 
     def _inside_comment_or_string(self) -> bool:
-        """Jangan munculkan saran di dalam komentar atau string."""
+        
         t = self.text
         index = t.index("insert")
         line, _col = index.split(".")
@@ -591,7 +576,7 @@ class CodeEditor(tk.Frame):
         return False
 
     def _maybe_complete(self):
-        """Debounce tipis supaya popup tidak berkedip saat mengetik cepat."""
+        
         if self._suppress_complete_once:
             self._suppress_complete_once = False
             self._close_completion()
@@ -671,7 +656,7 @@ class CodeEditor(tk.Frame):
         self._completion["prefix_len"] = len(prefix)
         self._show_item_help()
 
-        # posisikan di bawah kursor
+        
         self.update_idletasks()
         bbox = self.text.bbox("insert")
         if bbox:
@@ -690,7 +675,7 @@ class CodeEditor(tk.Frame):
                 pass
 
     def _show_item_help(self, _event=None):
-        """Tampilkan keterangan singkat untuk item yang sedang dipilih."""
+        
         comp = self._completion
         if not comp:
             return
@@ -771,6 +756,6 @@ class CodeEditor(tk.Frame):
                 pass
             self._completion = None
 
-    # ------------------------------------------------------------------
+    
     def focus_editor(self):
         self.text.focus_set()

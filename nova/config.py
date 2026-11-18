@@ -1,4 +1,4 @@
-"""Tema, warna, font, dan konstanta global NovaCode."""
+
 
 from __future__ import annotations
 
@@ -10,16 +10,9 @@ APP_NAME = "NovaCode"
 APP_VERSION = "1.1.0"
 APP_TITLE = f"{APP_NAME} — {APP_VERSION}"
 
-# ---------------------------------------------------------------------------
-# Tema warna. COLORS / TOKEN_COLORS adalah objek dict yang dimutasi langsung
-# oleh apply_theme(), sehingga semua modul yang meng-importnya ikut berubah.
-#
-# Prinsip desain: satu warna aksen per tema (dipakai hemat: tab aktif, tombol
-# utama, seleksi), sisanya netral hangat. Warna "white" berarti warna teks di
-# atas aksen (gelap untuk tema gelap) supaya kontras tetap terbaca.
-# ---------------------------------------------------------------------------
+
 THEMES = {
-    "Ember": {            # gelap hangat, aksen amber (sesuai logo)
+    "Ember": {            
         "colors": {
             "bg_deep": "#191817", "bg": "#201f1d", "bg_light": "#2a2825",
             "bg_lighter": "#383531", "border": "#33302c",
@@ -41,7 +34,7 @@ THEMES = {
             "search": "#5c4720", "search_current": "#8a6a24",
         },
     },
-    "Graphite": {         # abu netral, aksen koral
+    "Graphite": {         
         "colors": {
             "bg_deep": "#15171a", "bg": "#1c1e22", "bg_light": "#26292e",
             "bg_lighter": "#343840", "border": "#2c2f35",
@@ -63,7 +56,7 @@ THEMES = {
             "search": "#55402a", "search_current": "#8a6428",
         },
     },
-    "Moss": {             # hijau kelabu tua, aksen hijau limau
+    "Moss": {             
         "colors": {
             "bg_deep": "#151a17", "bg": "#1b221e", "bg_light": "#252e29",
             "bg_lighter": "#323d37", "border": "#2b352f",
@@ -85,7 +78,7 @@ THEMES = {
             "search": "#4a4a1e", "search_current": "#7d7424",
         },
     },
-    "Paper": {            # terang hangat (kertas), aksen oranye tua
+    "Paper": {            
         "light": True,
         "colors": {
             "bg_deep": "#fbf9f4", "bg": "#f1eee6", "bg_light": "#e8e4da",
@@ -108,7 +101,7 @@ THEMES = {
             "search": "#f0dd9a", "search_current": "#e0b84a",
         },
     },
-    "Purple Moon": {      # ungu malam, aksen violet mirip cahaya bulan
+    "Purple Moon": {      
         "colors": {
             "bg_deep": "#100e1a", "bg": "#171429", "bg_light": "#221d38",
             "bg_lighter": "#302949", "border": "#332c4c",
@@ -134,7 +127,7 @@ THEMES = {
 
 DEFAULT_THEME = "Ember"
 
-# Nama tema versi lama -> padanan terdekat (agar pengaturan lama tetap valid)
+
 LEGACY_THEMES = {
     "Midnight": "Graphite", "Aurora": "Ember",
     "Ocean": "Moss", "Nord Light": "Paper", "Ungu Moon": "Purple Moon",
@@ -150,7 +143,7 @@ def available_themes() -> list[str]:
 
 
 def resolve_theme(name: str | None) -> str:
-    """Ubah nama tema (termasuk nama lama / tidak dikenal) menjadi nama valid."""
+    
     if name in THEMES:
         return name
     return LEGACY_THEMES.get(name or "", DEFAULT_THEME)
@@ -161,7 +154,7 @@ def is_light_theme(name: str | None = None) -> bool:
 
 
 def apply_theme(name: str) -> str:
-    """Ganti tema secara global (dipanggil sebelum aplikasi dibuat ulang)."""
+    
     global CURRENT_THEME
     name = resolve_theme(name)
     CURRENT_THEME = name
@@ -178,9 +171,7 @@ FONT_SIZE = 12
 FONT_MONO_TUPLE = (FONT_MONO, FONT_SIZE)
 FONT_UI_TUPLE = (FONT_UI, 11)
 
-# ---------------------------------------------------------------------------
-# Definisi bahasa: keyword, builtin, jenis comment, dll.
-# ---------------------------------------------------------------------------
+
 COMMON_WORDS = {
     "python": {
         "keywords": [
@@ -380,7 +371,7 @@ LANGUAGE_LABELS = {
 
 
 def language_for(path: str | None) -> str:
-    """Tentukan bahasa dari ekstensi file."""
+    
     if not path:
         return "python"
     ext = os.path.splitext(path)[1].lower().lstrip(".")
@@ -392,14 +383,14 @@ def language_label(lang: str) -> str:
 
 
 def app_dir() -> str:
-    """Direktori tempat script berada (kompatibel dengan PyInstaller)."""
+    
     if getattr(sys, "frozen", False):
         return os.path.dirname(sys.executable)
     return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 def user_name() -> str:
-    """Nama user OS yang sedang login (dinamis, bukan hardcoded)."""
+    
     try:
         name = getpass.getuser().strip()
         if name:
@@ -410,11 +401,7 @@ def user_name() -> str:
 
 
 def settings_path() -> str:
-    """Simpan pengaturan per-user di AppData agar aman saat di-publish.
-
-    Jika dijalankan portable dari folder biasa dan APPDATA tidak tersedia,
-    file settings diletakkan di sebelah aplikasi.
-    """
+    
     appdata = os.environ.get("APPDATA")
     if appdata:
         folder = os.path.join(appdata, user_name(), APP_NAME)
@@ -427,6 +414,6 @@ def settings_path() -> str:
 
 
 def asset_path(*parts: str) -> str:
-    """Path file di folder assets/ (jalan di mode script maupun .exe PyInstaller)."""
+    
     base = getattr(sys, "_MEIPASS", None) or os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     return os.path.join(base, "assets", *parts)

@@ -1,10 +1,4 @@
-"""Penganalisis error dari keluaran terminal/perintah build.
 
-Menghasilkan satu atau lebih Diagnostic (file + baris + pesan + saran) agar
-panel Problems bisa menandai **semua** lokasi yang disebut, bukan hanya yang
-pertama. Mendukung traceback Python, error kompiler C/C++/TS/Go/Rust, dan
-format umum ``file:baris: error: pesan``.
-"""
 
 from __future__ import annotations
 
@@ -22,7 +16,6 @@ class Diagnostic:
     severity: str = "ERROR"
 
 
-# Aturan saran: pattern regex -> fungsi pembuat saran dari Match.
 HINT_RULES = [
     (r"ModuleNotFoundError: No module named ['\"]([^'\"]+)['\"]",
      lambda m: f"Pasang modul: pip install {m.group(1)}"),
@@ -103,17 +96,17 @@ _GENERIC_HINT = (
     "sesuai petunjuk (syntax, tipe, atau nilai)."
 )
 
-# Lokasi gaya traceback Python: File "x.py", line 12, in foo
+
 _TRACEBACK_LOC = re.compile(
     r'File\s+"([^"]+)",\s+line\s+(\d+)(?:,\s+in\s+([^\n]+))?', re.IGNORECASE)
-# Lokasi inline: src/main.c:12:5: error: ...
+
 _INLINE_LOC = re.compile(
     r'(?P<file>[A-Za-z]:[\\/][^\s:()]+|[^\s:()]+\.[A-Za-z0-9_]+|'
     r'\.?[\\/]?[^\s:()]+):(?P<line>\d+)(?::\d+)?:\s*'
     r'(?P<sev>error|warning|fatal error|note):\s*(?P<msg>.+)', re.IGNORECASE)
-# Lokasi gaya Rust: --> src/main.rs:5:3
+
 _ARROW_LOC = re.compile(r'-->\s*([^\s:]+):(\d+)(?::\d+)?')
-# Lokasi gaya stack JS: at fn (app.js:12:4)
+
 _STACK_LOC = re.compile(r'\(?([^\s()]+\.(?:js|jsx|ts|tsx|mjs|cjs)):(\d+):(\d+)\)?')
 
 
@@ -141,7 +134,7 @@ def _absolutize(path: str, fallback_dir: str | None) -> str:
 
 def analyze_output(output: str, current_file: str | None = None,
                    cwd: str | None = None) -> list[Diagnostic]:
-    """Kembalikan semua diagnostik yang ditemukan (bukan hanya yang pertama)."""
+    
     if not output or not output.strip():
         if current_file:
             return [Diagnostic(current_file, 1, "Perintah gagal tanpa keluaran.",
@@ -162,7 +155,7 @@ def analyze_output(output: str, current_file: str | None = None,
         seen.add(key)
         result.append(Diagnostic(file, line, message, hint or _hint_for(message), severity))
 
-    # 1) Error dengan lokasi inline: file:baris: error: pesan
+    
     inline_spans: list[tuple[int, int]] = []
     for m in _INLINE_LOC.finditer(output):
         sev = m.group("sev").lower()
@@ -173,7 +166,7 @@ def analyze_output(output: str, current_file: str | None = None,
         add(m.group("file"), int(m.group("line")), msg,
             severity="WARN" if "warning" in sev else "ERROR")
 
-    # 2) Traceback Python: kumpulkan SEMUA frame, lalu pasangkan dengan error.
+    
     locations = [
         (m.start(), m.group(1), int(m.group(2)))
         for m in _TRACEBACK_LOC.finditer(output)
@@ -187,7 +180,7 @@ def analyze_output(output: str, current_file: str | None = None,
         for m in _STACK_LOC.finditer(output)
     ]
     locations.sort(key=lambda x: x[0])
-    # Hilangkan lokasi yang sudah dipakai rule inline agar tidak dobel.
+    
     locations = [
         loc for loc in locations
         if not any(a <= loc[0] < b for a, b in inline_spans)
@@ -211,7 +204,7 @@ def analyze_output(output: str, current_file: str | None = None,
     for pattern, _build in HINT_RULES:
         for m in re.finditer(pattern, output, re.IGNORECASE):
             add_message(m.start(), m.group(0))
-    # Pesan umum: baris yang mengandung kata Error/Failed/Exception.
+    
     for m in re.finditer(r"(?im)^.*\b(?:error|failed|exception)\b.*$", output):
         text = m.group(0).strip()
         if not text or text.lower().startswith(("file ", "at ")):
@@ -223,8 +216,8 @@ def analyze_output(output: str, current_file: str | None = None,
 
     if not messages:
         if not result:
-            # Perintah gagal dengan format yang tidak dikenal: tetap catat satu
-            # diagnostik dari baris terakhir supaya tidak hilang dari Output.
+            
+            
             last = next((ln.strip() for ln in reversed(output.splitlines())
                          if ln.strip()), "")
             add(current_file or "", 1, last or "Perintah gagal.",
@@ -232,8 +225,8 @@ def analyze_output(output: str, current_file: str | None = None,
         return result
 
     for pos, message in messages:
-        # Semua frame yang mendahului error ikut ditandai (sesuai permintaan:
-        # "tandai semua tempatnya"). Kalau belum ada frame, pakai file aktif.
+        
+        
         preceding = [loc for loc in locations if loc[0] <= pos]
         chosen = preceding or locations or [(pos, current_file or "", 1)]
         for _p, file, line in chosen:
